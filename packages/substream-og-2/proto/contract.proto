@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package contract.v1;
+ 
+
+message Events {
+    repeated teller_SubmittedBid teller_submitted_bids = 1;
+    repeated teller_AcceptedBid teller_accepted_bids = 2;
+    repeated teller_CancelledBid teller_cancelled_bids = 3;
+    repeated teller_LoanLiquidated teller_loan_liquidateds = 4;
+    repeated teller_LoanRepayment teller_loan_repayments = 5;
+    repeated teller_LoanRepaid teller_loan_repaids = 6;
+    repeated teller_FeePaid teller_fee_paids = 7;
+    repeated teller_MarketOwnerCancelledBid teller_market_owner_cancelled_bids = 8;
+    repeated teller_LoanClosed teller_loan_closeds = 9;
+    repeated teller_Initialized teller_initializeds = 10;
+    repeated teller_MarketForwarderApproved teller_market_forwarder_approveds = 11;
+    repeated teller_MarketForwarderRenounced teller_market_forwarder_renounceds = 12;
+    repeated teller_OwnershipTransferred teller_ownership_transferreds = 13;
+    repeated teller_Paused teller_pauseds = 14;
+    repeated teller_ProtocolFeeSet teller_protocol_fee_sets = 15;
+    repeated teller_TrustedMarketForwarderSet teller_trusted_market_forwarder_sets = 16;
+    repeated teller_Unpaused teller_unpauseds = 17;
+}
+
+message teller_SubmittedBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+    bytes borrower = 7;
+    bytes receiver = 8;
+    bytes metadata_uri = 9;
+}
+
+message teller_AcceptedBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+    bytes lender = 7;
+}
+
+message teller_CancelledBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+}
+
+message teller_LoanLiquidated {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+    bytes liquidator = 7;
+}
+
+message teller_LoanRepayment {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+}
+
+message teller_LoanRepaid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+}
+
+message teller_FeePaid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+    string fee_type = 7;
+    string amount = 8;
+}
+
+message teller_MarketOwnerCancelledBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+}
+
+message teller_LoanClosed {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string bid_id = 6;
+}
+
+message teller_Initialized {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string version = 6;
+}
+
+message teller_MarketForwarderApproved {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string market_id = 6;
+    bytes forwarder = 7;
+    bytes sender = 8;
+}
+
+message teller_MarketForwarderRenounced {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string market_id = 6;
+    bytes forwarder = 7;
+    bytes sender = 8;
+}
+
+message teller_OwnershipTransferred {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    bytes previous_owner = 6;
+    bytes new_owner = 7;
+}
+
+message teller_Paused {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    bytes account = 6;
+}
+
+message teller_ProtocolFeeSet {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string new_fee = 6;
+    string old_fee = 7;
+}
+
+message teller_TrustedMarketForwarderSet {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    string market_id = 6;
+    bytes forwarder = 7;
+    bytes sender = 8;
+}
+
+message teller_Unpaused {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string evt_address = 5;
+    bytes account = 6;
+}

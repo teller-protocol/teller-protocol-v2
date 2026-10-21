@@ -115,3 +115,22 @@ pub fn fetch_token_amount_difference_from_liquidations(pool_contract_address: &S
  
  
 }
+
+
+pub fn fetch_excessive_principal_tokens_repaid(pool_contract_address: &String) -> Option<BigInt> {
+        
+    let pool_contract_address_decoded = Hex::decode(pool_contract_address).unwrap(); 
+        
+         
+    
+        let get_excessive_tokens_repaid_function = abi::lendergroup_contract::functions::ExcessivePrincipalTokensRepaid {    };
+        let  excessive_tokens_repaid  = get_excessive_tokens_repaid_function.call(
+            pool_contract_address_decoded.clone()
+         )  ;
+        
+      
+    
+    return  excessive_tokens_repaid ; 
+ 
+ 
+}
